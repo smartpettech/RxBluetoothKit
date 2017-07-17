@@ -141,7 +141,7 @@ class QueueSubscribeOn<Element>: Cancelable, ObservableType, ObserverType, Delay
     // subscription.
     func dispose() {
         if OSAtomicCompareAndSwap32(0, 1, &isDisposed) {
-            self.queue.unsubscribe(observable: self)
+            self.queue.unsubscribe(self)
             queue.scheduler.schedule(()) {
                 self.serialDisposable.dispose()
                 return NopDisposable.instance
