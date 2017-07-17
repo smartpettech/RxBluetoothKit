@@ -48,7 +48,8 @@ class SerializedSubscriptionQueue {
     func queueSubscription(observable: DelayedObservableType) {
         lock.lock(); defer { lock.unlock() }
         let execute = queue.isEmpty
-        if !queue.contains { $0 === observable } {
+        let hasItem = queue.contains { $0 === observable }
+        if !hasItem {
             queue.append(observable)
         }
         if execute {
