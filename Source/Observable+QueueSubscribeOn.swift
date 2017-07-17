@@ -48,7 +48,9 @@ class SerializedSubscriptionQueue {
     func queueSubscription(observable: DelayedObservableType) {
         lock.lock(); defer { lock.unlock() }
         let execute = queue.isEmpty
-        queue.append(observable)
+        if !queue.contains { $0 === observable } {
+            queue.append(observable)
+        }
         if execute {
             // Observable is scheduled immidiately
             queue.first?.delayedSubscribe(scheduler)
@@ -138,8 +140,8 @@ class QueueSubscribeOn<Element>: Cancelable, ObservableType, ObserverType, Delay
     // subscription.
     func dispose() {
         if OSAtomicCompareAndSwap32(0, 1, &isDisposed) {
+            self.queue.unsubscribe(observable: self)
             queue.scheduler.schedule(()) {
-                self.queue.unsubscribe(self)
                 self.serialDisposable.dispose()
                 return NopDisposable.instance
             }
